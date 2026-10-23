@@ -1,3 +1,5 @@
+import json
+import os
 from scapy.all import sniff,IP,TCP
 from datetime import datetime
 import time
@@ -31,8 +33,23 @@ def check_port_scan(src_ip,dst_port):
 
 
     if len(unique_ports) >= PORT_THRESHOLD:
+
+        #构造告警数据
+        alert_data = {
+            "timestamp":datetime.now().isoformat(),
+            "alert_type":"PORT_SCAN",
+            "source_ip":src_ip,
+            "port_count":len(unique_ports),
+            "duration_seconds":TIME_WINDOW
+        }
+
+        #终端打印红色高亮
         print(f"\n\033[91m[警报] 检测到端口扫描！\033[0m")
         print(f"\033[91m源 IP:{src_ip} | 在{TIME_WINDOW}秒内扫描了{len(unique_ports)}个端口\033[0m\n")
+
+        #写入 json 文件
+        with open("alerts.log","a",encoding="utf-8")as f:
+            f.write(json.dumps(alert_data,ensure_ascii=False) + "\n")
 
         #清空记录，防止同一次扫描疯狂报警
         scan_history[src_ip] = []
