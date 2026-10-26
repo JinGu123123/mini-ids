@@ -6,3 +6,4 @@ dist/
 build/
 *.egg-info/
 alerts.log
+syn-flood.png
